@@ -1,4 +1,3 @@
-"""
 # dAiv Reinforcement Learning Basics
 
 ## Dependencies
@@ -51,5 +50,5 @@ Run the DQN-based snake AI:
 python snake_game_DQN/main.py
 ```
 
-# Credits
+## Credits
 Snake game code by HonzaKral: https://gist.github.com/HonzaKral/833ee2b30231c53ec78e
