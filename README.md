@@ -41,13 +41,13 @@ python snake_playable.py
 ### 2. Evolutionary Snake Game
 Use genetic algorithms to evolve the snake:
 ```
-python snake_game_genome/evolution.py
+python genetic/main_genetic.py
 ```
 
 ### 3. Deep Q-Learning Snake Game
 Run the DQN-based snake AI:
 ```
-python snake_game_DQN/main.py
+python dqn/main_dqn.py
 ```
 
 ## Credits

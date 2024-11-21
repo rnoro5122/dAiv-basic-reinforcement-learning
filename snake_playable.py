@@ -2,15 +2,7 @@ import pygame
 import random
 import numpy as np
 import time
-
-# 게임 설정
-FPS = 60
-SCREEN_SIZE = 40
-PIXEL_SIZE = 20
-LINE_WIDTH = 1
-INITIAL_SPEED = 20  # 초당 이동 횟수 (초기 속도)
-MIN_SPEED = 20      # 최소 속도
-MAX_SPEED = 40     # 최대 속도
+from config import FPS, SCREEN_SIZE, PIXEL_SIZE, LINE_WIDTH, SPEED
 
 # 방향 정의
 DIRECTIONS = np.array([
@@ -23,7 +15,7 @@ DIRECTIONS = np.array([
 class Snake:
     def __init__(self, screen):
         self.screen = screen
-        self.speed = INITIAL_SPEED
+        self.speed = SPEED
         self.reset_game()
 
     def reset_game(self):
@@ -99,11 +91,6 @@ class Snake:
                                     return False
                                 elif e.type == pygame.KEYDOWN and e.key == pygame.K_SPACE:
                                     pause = False
-                    # # 속도 조절 키 추가
-                    # elif event.key == pygame.K_PLUS or event.key == pygame.K_KP_PLUS or event.key == pygame.K_EQUALS:
-                    #     self.speed = min(MAX_SPEED, self.speed + 1)
-                    # elif event.key == pygame.K_MINUS or event.key == pygame.K_KP_MINUS:
-                    #     self.speed = max(MIN_SPEED, self.speed - 1)
 
             # 방향키 입력 처리
             keys = pygame.key.get_pressed()
@@ -168,7 +155,6 @@ class Snake:
                     if event.key == pygame.K_ESCAPE:
                         return False
                     elif event.key == pygame.K_SPACE:
-                        self.speed = INITIAL_SPEED  # 재시작 시 초기 속도로 리셋
                         self.reset_game()
                         return True
 

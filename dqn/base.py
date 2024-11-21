@@ -1,8 +1,8 @@
-import pygame
-import random
+import gymnasium as gym
+from gymnasium import spaces
 import numpy as np
+import random
 import config
-import time
 
 # 방향 정의
 DIRECTIONS = np.array([
@@ -12,11 +12,19 @@ DIRECTIONS = np.array([
     (-1, 0)   # LEFT
 ])
 
-class SnakeEnv:
+class SnakeEnv(gym.Env):
+    metadata = {'render.modes': ['human']}
+
     def __init__(self):
+        super(SnakeEnv, self).__init__()
+        self.action_space = spaces.Discrete(4)  # 4개의 방향 (UP, RIGHT, DOWN, LEFT)
+        self.observation_space = spaces.Box(
+            low=0, high=1, shape=(config.SCREEN_SIZE, config.SCREEN_SIZE, 3), dtype=np.uint8
+        )
         self.reset()
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
         center_x, center_y = config.SCREEN_SIZE // 2, config.SCREEN_SIZE // 2
         self.snake = np.array([
             [center_x, center_y],
@@ -27,9 +35,8 @@ class SnakeEnv:
         self.direction = 0
         self.score = 0
         self.done = False
-        self.last_move_time = time.time()
         self.place_fruit()
-        return self.get_observation()
+        return self.get_observation(), {}
 
     def place_fruit(self):
         while True:
@@ -48,7 +55,7 @@ class SnakeEnv:
 
     def step(self, action):
         if self.done:
-            return self.get_observation(), 0, self.done
+            return self.get_observation(), 0, self.done, {}
 
         self.direction = action
         old_head = self.snake[0]
@@ -60,7 +67,7 @@ class SnakeEnv:
                 new_head[1] < 0 or new_head[1] >= config.SCREEN_SIZE or
                 new_head.tolist() in self.snake.tolist()):
             self.done = True
-            return self.get_observation(), -10, self.done
+            return self.get_observation(), -10, self.done, {}
 
         # 과일을 먹으면 점수 증가
         reward = 1
@@ -73,28 +80,39 @@ class SnakeEnv:
 
         # 새로운 머리 추가
         self.snake = np.concatenate([[new_head], self.snake], axis=0)
-        return self.get_observation(), reward, self.done
+        return self.get_observation(), reward, self.done, {}
 
-    def render(self, screen):
-        screen.fill((0, 0, 0))
+    def render(self, mode='human'):
+        import pygame
+        if not hasattr(self, 'screen'):
+            pygame.init()
+            self.screen = pygame.display.set_mode(
+                (config.SCREEN_SIZE * config.PIXEL_SIZE, config.SCREEN_SIZE * config.PIXEL_SIZE)
+            )
+            pygame.display.set_caption('Snake Game with Gymnasium')
+        self.screen.fill((0, 0, 0))
 
         # 테두리 그리기
-        pygame.draw.rect(screen, (255, 255, 255), [0, 0, config.SCREEN_SIZE * config.PIXEL_SIZE, config.LINE_WIDTH])
-        pygame.draw.rect(screen, (255, 255, 255), [0, config.SCREEN_SIZE * config.PIXEL_SIZE - config.LINE_WIDTH, config.SCREEN_SIZE * config.PIXEL_SIZE, config.LINE_WIDTH])
-        pygame.draw.rect(screen, (255, 255, 255), [0, 0, config.LINE_WIDTH, config.SCREEN_SIZE * config.PIXEL_SIZE])
-        pygame.draw.rect(screen, (255, 255, 255), [config.SCREEN_SIZE * config.PIXEL_SIZE - config.LINE_WIDTH, 0, config.LINE_WIDTH, config.SCREEN_SIZE * config.PIXEL_SIZE])
+        pygame.draw.rect(self.screen, (255, 255, 255), [0, 0, config.SCREEN_SIZE * config.PIXEL_SIZE, config.LINE_WIDTH])
+        pygame.draw.rect(self.screen, (255, 255, 255), [0, config.SCREEN_SIZE * config.PIXEL_SIZE - config.LINE_WIDTH, config.SCREEN_SIZE * config.PIXEL_SIZE, config.LINE_WIDTH])
+        pygame.draw.rect(self.screen, (255, 255, 255), [0, 0, config.LINE_WIDTH, config.SCREEN_SIZE * config.PIXEL_SIZE])
+        pygame.draw.rect(self.screen, (255, 255, 255), [config.SCREEN_SIZE * config.PIXEL_SIZE - config.LINE_WIDTH, 0, config.LINE_WIDTH, config.SCREEN_SIZE * config.PIXEL_SIZE])
 
         # 뱀과 과일 그리기
         for bit in self.snake:
-            pygame.draw.rect(screen, (0, 255, 0),
+            pygame.draw.rect(self.screen, (0, 255, 0),
                              (bit[0] * config.PIXEL_SIZE, bit[1] * config.PIXEL_SIZE, config.PIXEL_SIZE, config.PIXEL_SIZE))
-        pygame.draw.rect(screen, (255, 0, 0),
+        pygame.draw.rect(self.screen, (255, 0, 0),
                          (self.fruit[0] * config.PIXEL_SIZE, self.fruit[1] * config.PIXEL_SIZE, config.PIXEL_SIZE, config.PIXEL_SIZE))
 
-
-    # 점수 표시
+        # 점수 표시
         font = pygame.font.SysFont(None, 20)
         score_text = font.render(f"Score: {self.score}", True, (255, 255, 255))
-        screen.blit(score_text, (5, 5))
-
+        self.screen.blit(score_text, (5, 5))
         pygame.display.flip()
+
+    def close(self):
+        if hasattr(self, 'screen'):
+            import pygame
+            pygame.quit()
+            del self.screen
