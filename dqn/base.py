@@ -67,14 +67,14 @@ class SnakeEnv(gym.Env):
                 new_head[1] < 0 or new_head[1] >= config.SCREEN_SIZE or
                 new_head.tolist() in self.snake.tolist()):
             self.done = True
-            return self.get_observation(), -10, self.done, {}
+            return self.get_observation(), -100, self.done, {}
 
         # 과일을 먹으면 점수 증가
-        reward = 1
+        reward = 10
         if all(new_head == self.fruit):
             self.score += 1
             self.place_fruit()
-            reward = 10
+            reward = 100
         else:
             self.snake = self.snake[:-1, :]  # 꼬리 삭제
 
