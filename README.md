@@ -13,22 +13,22 @@ For NVIDIA GPUs (CUDA versions):
 
 CUDA 11.8
 ```bash
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
 CUDA 12.1
 ```bash
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
 CUDA 12.4
 ```bash
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 ```
 
 using Mac or Window cpu environment
 ```bash
-pip3 install torch torchvision torchaudio
+pip install torch torchvision torchaudio
 ```
 
 ## How to Run
